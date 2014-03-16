@@ -1,6 +1,13 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 
+inline static double gettime(void) {
+	return (
+		(double) SDL_GetPerformanceCounter() /
+		(double) SDL_GetPerformanceFrequency()
+	);
+}
+
 inline static double clamp(double val, double min, double max) {
 	return (val < min) ? min : (val > max) ? max : val;
 }
@@ -255,8 +262,9 @@ void collide(const struct gnop_paddle *paddle, struct gnop_ball *ball) {
 void gameinit(struct gnop_cfg *cfg) {
 	cfg->state.alive = SDL_TRUE;
 	cfg->state.paused = SDL_FALSE;
-	cfg->state.speed = 0.2;
+	cfg->state.speed = 1.0;
 	cfg->state.lwin = 12;
+	cfg->state.ltick = gettime();
 	cfg->state.ball.x = 0.5;
 	cfg->state.ball.y = 0.5;
 	cfg->state.ball.xs = 0.0;
@@ -282,13 +290,10 @@ void gameinit(struct gnop_cfg *cfg) {
 void update(struct gnop_cfg *cfg) {
 	SDL_Event e;
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
-	double dt;
+	double dt, rdt;
 	static double accum = 0.0;
-	cfg->state.ctick =
-		(double) SDL_GetPerformanceCounter() /
-		(double) SDL_GetPerformanceFrequency()
-	;
-	dt = cfg->state.ctick - cfg->state.ltick;
+	cfg->state.ctick = gettime();
+	rdt = cfg->state.ctick - cfg->state.ltick;
 	SDL_GL_GetDrawableSize(cfg->win, &(cfg->state.w), &(cfg->state.h));
 	cfg->state.ball.w = 0.05 * (double) ((double) cfg->state.h / (double) cfg->state.w);
 	cfg->state.ball.h = cfg->state.ball.w * (double) ((double) cfg->state.w / (double) cfg->state.h);
@@ -321,28 +326,28 @@ void update(struct gnop_cfg *cfg) {
 			}
 		}
 	}
-	if (dt < MAGICDT) {
-		accum += dt;
+	if (rdt + accum < MAGICDT) {
 		return;
 	}
-	if (cfg->state.paused) {
+	if (cfg->state.paused == SDL_TRUE) {
 		return;
 	}
-	while (accum > MAGICDT) {
+	accum += rdt;
+	while (accum >= MAGICDT) {
 		dt = MAGICDT;
 		/* left paddle */
 		if (state[SDL_SCANCODE_W]) {
-			cfg->state.pleft.y += dt * cfg->state.speed * 0.2;
+			cfg->state.pleft.y += dt * 1.4 * cfg->state.speed;
 		}
 		if (state[SDL_SCANCODE_S]) {
-			cfg->state.pleft.y -= dt * cfg->state.speed * 0.2;
+			cfg->state.pleft.y -= dt * 1.4 * cfg->state.speed;
 		}
 		/* right paddle */
 		if (state[SDL_SCANCODE_UP]) {
-			cfg->state.pright.y += dt * cfg->state.speed * 0.2;
+			cfg->state.pright.y += dt * 1.4 * cfg->state.speed;
 		}
 		if (state[SDL_SCANCODE_DOWN]) {
-			cfg->state.pright.y -= dt * cfg->state.speed * 0.2;
+			cfg->state.pright.y -= dt * 1.4 * cfg->state.speed;
 		}
 		/* clamp y */
 		cfg->state.pleft.y = clamp(
@@ -370,7 +375,7 @@ void update(struct gnop_cfg *cfg) {
 				diffx * diffx +
 				diffy * diffy +
 				diffz * diffz
-			) * 0.1;
+			);
 		}
 		/* y-mazing speed :O */
 		{
@@ -382,10 +387,10 @@ void update(struct gnop_cfg *cfg) {
 				diffx * diffx +
 				diffy * diffy +
 				diffz * diffz
-			) * 0.1;
+			);
 		}
-		cfg->state.ball.x += dt * cfg->state.speed * cfg->state.ball.xd * cfg->state.ball.xs;
-		cfg->state.ball.y += dt * cfg->state.speed * cfg->state.ball.yd * cfg->state.ball.ys;
+		cfg->state.ball.x += dt * cfg->state.speed * cfg->state.ball.xd * 0.9 * cfg->state.ball.xs;
+		cfg->state.ball.y += dt * cfg->state.speed * cfg->state.ball.yd * 0.9 * cfg->state.ball.ys;
 		cfg->state.ball.x = clamp(cfg->state.ball.x, 0.0, 1.0);
 		cfg->state.ball.y = clamp(cfg->state.ball.y, 0.0, 1.0);
 		/* paddle collision */
