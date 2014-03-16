@@ -11,19 +11,24 @@ Controls
 Left paddle
 ----
 
-	* W: move up
-	* S: move down
+* W: move up
+* S: move down
 
 Right paddle
 ----
 
-	* ↑: move up
-	* ↓: move down
+* ↑: move up
+* ↓: move down
 
 General
 ----
 
-	* R: reset
-	* P: pause
-	* +: increase game speed
-	* -: decrease game speed
+* R: reset
+* P: pause
+* +: increase game speed
+* -: decrease game speed
+
+Building
+====
+
+Get (SDL2)[http://libsdl.org/download-2.0.php], run `make`.
