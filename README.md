@@ -23,6 +23,7 @@ Right paddle
 General
 ----
 
+* Q/Esc: exit
 * R: reset
 * P: pause
 * +: increase game speed
