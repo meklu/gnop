@@ -332,17 +332,17 @@ void update(struct gnop_cfg *cfg) {
 		dt = MAGICDT;
 		/* left paddle */
 		if (state[SDL_SCANCODE_W]) {
-			cfg->state.pleft.y += dt * cfg->state.speed * 0.1;
+			cfg->state.pleft.y += dt * cfg->state.speed * 0.2;
 		}
 		if (state[SDL_SCANCODE_S]) {
-			cfg->state.pleft.y -= dt * cfg->state.speed * 0.1;
+			cfg->state.pleft.y -= dt * cfg->state.speed * 0.2;
 		}
 		/* right paddle */
 		if (state[SDL_SCANCODE_UP]) {
-			cfg->state.pright.y += dt * cfg->state.speed * 0.1;
+			cfg->state.pright.y += dt * cfg->state.speed * 0.2;
 		}
 		if (state[SDL_SCANCODE_DOWN]) {
-			cfg->state.pright.y -= dt * cfg->state.speed * 0.1;
+			cfg->state.pright.y -= dt * cfg->state.speed * 0.2;
 		}
 		/* clamp y */
 		cfg->state.pleft.y = clamp(
