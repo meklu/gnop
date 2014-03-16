@@ -1,7 +1,7 @@
 gnop
 ====
 
-This was a game for the (Minify Game Jam)[http://minifygamejam.github.io].
+This was a game for the [Minify Game Jam](http://minifygamejam.github.io).
 The theme this time around was pong. This game's twist was that the ball's
 movement vector was affected by the paddles.
 
@@ -31,4 +31,4 @@ General
 Building
 ====
 
-Get (SDL2)[http://libsdl.org/download-2.0.php], run `make`.
+Get [SDL2](http://libsdl.org/download-2.0.php), run `make`.
