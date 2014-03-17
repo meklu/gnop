@@ -199,6 +199,7 @@ struct gnop_ball {
 struct gnop_state {
 	SDL_bool alive;
 	SDL_bool paused;
+	SDL_bool vsync;
 	int w;
 	int h;
 	struct gnop_paddle pleft;
@@ -259,9 +260,41 @@ void collide(const struct gnop_paddle *paddle, struct gnop_ball *ball) {
 	}
 }
 
+void renderinit(struct gnop_cfg *cfg) {
+	if (cfg->win == NULL) {
+		cfg->ctx = NULL;
+		cfg->win = SDL_CreateWindow(
+			__FILE__,
+			SDL_WINDOWPOS_CENTERED,
+			SDL_WINDOWPOS_CENTERED,
+			cfg->state.w,
+			cfg->state.h,
+			SDL_WINDOW_RESIZABLE
+		);
+	}
+	if (cfg->ctx == NULL) {
+		int flags = SDL_RENDERER_ACCELERATED;
+		if (cfg->state.vsync) {
+			flags |= SDL_RENDERER_PRESENTVSYNC;
+		}
+		printf(
+			"creating a renderer with vsync %sabled\n",
+			(cfg->state.vsync) ? "en" : "dis"
+		);
+		cfg->ctx = SDL_CreateRenderer(
+			cfg->win,
+			-1,
+			flags
+		);
+	}
+	SDL_assert_release(cfg->win != NULL);
+	SDL_assert_release(cfg->ctx != NULL);
+}
+
 void gameinit(struct gnop_cfg *cfg) {
 	cfg->state.alive = SDL_TRUE;
 	cfg->state.paused = SDL_FALSE;
+	cfg->state.vsync = SDL_TRUE;
 	cfg->state.speed = 1.0;
 	cfg->state.lwin = 12;
 	cfg->state.ltick = gettime();
@@ -284,6 +317,7 @@ void gameinit(struct gnop_cfg *cfg) {
 	cfg->state.pright.w = cfg->state.pleft.w;
 	cfg->state.pright.h = cfg->state.pleft.h;
 	cfg->state.pright.points = 0;
+	renderinit(cfg);
 }
 
 #define MAGICDT 0.005
@@ -307,6 +341,12 @@ void update(struct gnop_cfg *cfg) {
 			case 'q':
 			case SDLK_ESCAPE:
 				cfg->state.alive = SDL_FALSE;
+				break;
+			case 'v':
+				cfg->state.vsync = !cfg->state.vsync;
+				SDL_DestroyRenderer(cfg->ctx);
+				cfg->ctx = NULL;
+				renderinit(cfg);
 				break;
 			case ' ':
 			case 'p':
@@ -511,21 +551,7 @@ int main(int argc, char **argv) {
 	SDL_assert_release(
 		SDL_Init(SDL_INIT_EVERYTHING) == 0
 	);
-	cfg.win = SDL_CreateWindow(
-		__FILE__,
-		SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED,
-		cfg.state.w,
-		cfg.state.h,
-		SDL_WINDOW_RESIZABLE
-	);
-	cfg.ctx = SDL_CreateRenderer(
-		cfg.win,
-		-1,
-		SDL_RENDERER_ACCELERATED
-	);
 	cfg.state.alive = SDL_TRUE;
-	SDL_assert_release(cfg.win != NULL);
 	gameinit(&cfg);
 	gameloop(&cfg);
 	SDL_Quit();

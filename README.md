@@ -26,6 +26,7 @@ General
 * Q/Esc: exit
 * R: reset
 * P: pause
+* V: toggle vsync
 * +: increase game speed
 * -: decrease game speed
 
