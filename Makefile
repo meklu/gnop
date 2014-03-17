@@ -1,6 +1,7 @@
 CC := gcc
 CFLAGS := -Wall -Wextra -pedantic -Wstrict-prototypes -Os -g
-LDFLAGS := -lSDL2
+LDFLAGS := $(shell pkg-config --libs sdl2)
+INCLUDE := $(shell pkg-config --cflags-only-I sdl2)
 
 TARGETS = gnop
 
@@ -11,7 +12,7 @@ all : $(TARGETS)
 fall : clean $(TARGETS)
 
 clean :
-	rm -f $(TARGETS)
+	$(RM) $(TARGETS)
 
-msgbox : gnop.c
-	$(CC) $(CFLAGS) $(LDFLAGS) gnop.c -o gnop
+gnop : gnop.c
+	$(CC) $(INCLUDE) $(CFLAGS) gnop.c -o gnop $(LDFLAGS)
