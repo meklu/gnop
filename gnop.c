@@ -370,6 +370,7 @@ void update(struct gnop_cfg *cfg) {
 		return;
 	}
 	if (cfg->state.paused == SDL_TRUE) {
+		cfg->state.ltick = cfg->state.ctick;
 		return;
 	}
 	accum += rdt;
